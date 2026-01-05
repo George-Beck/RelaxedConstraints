@@ -9,7 +9,7 @@
     "new-post": "node scripts/new-post.mjs"
   },
   "dependencies": {
-    "astro": "^5.0.0",
+    "astro": "^5.16.6",
     "@astrojs/mdx": "^4.0.0"
   },
   "devDependencies": {
