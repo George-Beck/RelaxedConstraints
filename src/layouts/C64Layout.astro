@@ -1,0 +1,41 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title = "Relaxed Constraints" } = Astro.props;
+---
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+  <link rel="stylesheet" href="/styles/c64.css">
+</head>
+<body>
+  <div class="crt-frame">
+    <div class="screen-content">
+      <header class="simple-header">
+        <h1 class="site-title">Relaxed Constraints</h1>
+        <p class="site-byline">by George Beck</p>
+        <nav class="main-nav">
+          <a href="/">Home</a>
+          <a href="/posts">Posts</a>
+          <a href="/reading">Reading</a>
+          <a href="/about">About</a>
+        </nav>
+      </header>
+      
+      <main class="content-area">
+        <slot />
+      </main>
+      
+      <footer class="status-bar">
+        <p>George Beck-2026</p>
+      </footer>
+    </div>
+  </div>
+</body>
+</html>
+

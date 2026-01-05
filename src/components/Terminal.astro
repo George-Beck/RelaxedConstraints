@@ -1,0 +1,327 @@
+---
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('posts');
+const postsByCategory = {
+  research: allPosts.filter(p => p.data.category === 'research'),
+  commentary: allPosts.filter(p => p.data.category === 'commentary'),
+  'literature reviews': allPosts.filter(p => p.data.category === 'literature reviews'),
+};
+---
+
+<div class="terminal">
+  <div class="terminal-output" id="output">
+    <p style="margin-bottom: 1em;">Welcome to Relaxed Constraints Terminal v1.0</p>
+    <p style="margin-bottom: 1em;">Type <strong>help</strong> for commands or <strong>ls</strong> to explore.</p>
+  </div>
+  <div class="terminal-input-line">
+    <span class="prompt">guest@relaxed-constraints:~$</span>
+    <input type="text" class="terminal-input" id="terminal-input" autofocus autocomplete="off" />
+  </div>
+</div>
+
+<script define:vars={{ postsByCategory }}>
+  const output = document.getElementById('output');
+  const input = document.getElementById('terminal-input');
+  
+  let currentPath = '~';
+  let currentDir = 'root'; // Can be: 'root', 'posts', 'category'
+  let currentCategory = null;
+  let mathQuestion = null;
+  let triviaQuestion = null;
+
+  const categories = Object.keys(postsByCategory);
+
+  function addOutput(text, isHtml = false) {
+    const p = document.createElement('p');
+    if (isHtml) {
+      p.innerHTML = text;
+    } else {
+      p.textContent = text;
+    }
+    output.appendChild(p);
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function addCommand(cmd) {
+    addOutput(`guest@relaxed-constraints:${currentPath}$ ${cmd}`);
+  }
+
+  function updatePrompt() {
+    const promptElement = document.querySelector('.prompt');
+    if (promptElement) {
+      promptElement.textContent = `guest@relaxed-constraints:${currentPath}$`;
+    }
+  }
+
+  async function generateMathQuestion() {
+    const operations = ['+', '-', '*'];
+    const op = operations[Math.floor(Math.random() * operations.length)];
+    let num1, num2, answer;
+
+    if (op === '*') {
+      num1 = Math.floor(Math.random() * 12) + 1;
+      num2 = Math.floor(Math.random() * 12) + 1;
+      answer = num1 * num2;
+    } else if (op === '-') {
+      num1 = Math.floor(Math.random() * 50) + 10;
+      num2 = Math.floor(Math.random() * num1);
+      answer = num1 - num2;
+    } else {
+      num1 = Math.floor(Math.random() * 50) + 1;
+      num2 = Math.floor(Math.random() * 50) + 1;
+      answer = num1 + num2;
+    }
+
+    return {
+      question: `${num1} ${op} ${num2}`,
+      answer: answer
+    };
+  }
+
+  async function fetchTriviaQuestion() {
+    try {
+      const response = await fetch('https://opentdb.com/api.php?amount=1&type=multiple');
+      const data = await response.json();
+      if (data.results && data.results.length > 0) {
+        const q = data.results[0];
+        const allAnswers = [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5);
+        return {
+          question: decodeHtml(q.question),
+          answers: allAnswers.map(decodeHtml),
+          correct: decodeHtml(q.correct_answer)
+        };
+      }
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function decodeHtml(html) {
+    const txt = document.createElement('textarea');
+    txt.innerHTML = html;
+    return txt.value;
+  }
+
+  async function handleCommand(cmd) {
+    cmd = cmd.trim();
+    
+    if (!cmd) return;
+
+    addCommand(cmd);
+
+    // Check if answering math question
+    if (mathQuestion !== null) {
+      const userAnswer = parseInt(cmd);
+      if (userAnswer === mathQuestion.answer) {
+        addOutput('✓ Correct! Well done!');
+      } else {
+        addOutput(`✗ Incorrect. The answer was ${mathQuestion.answer}`);
+      }
+      mathQuestion = null;
+      return;
+    }
+
+    // Check if answering trivia question
+    if (triviaQuestion !== null) {
+      const userAnswer = cmd.toLowerCase().trim();
+      const correctAnswer = triviaQuestion.correct.toLowerCase().trim();
+      
+      if (userAnswer === correctAnswer) {
+        addOutput('✓ Correct! Great job!');
+      } else {
+        addOutput(`✗ Incorrect. The correct answer was: ${triviaQuestion.correct}`);
+      }
+      triviaQuestion = null;
+      return;
+    }
+
+    const parts = cmd.split(' ');
+    const command = parts[0].toLowerCase();
+    const args = parts.slice(1);
+
+    switch (command) {
+      case 'help':
+        addOutput('Available commands:');
+        addOutput('  ls              - list contents');
+        addOutput('  cd [dir]        - change directory');
+        addOutput('  cat [file]      - read a file');
+        addOutput('  open [slug]     - open a post in browser');
+        addOutput('  about           - go to about page');
+        addOutput('  reading         - go to reading page');
+        addOutput('  clear           - clear terminal');
+        addOutput('  math            - answer a quick math question');
+        addOutput('  trivia          - answer a trivia question');
+        addOutput('  echo [text]     - print text');
+        addOutput('  date            - show current date');
+        break;
+
+      case 'ls':
+        if (currentDir === 'root') {
+          addOutput('Directories:');
+          addOutput('  posts/');
+          addOutput('');
+          addOutput('Pages:');
+          addOutput('  about');
+          addOutput('  reading');
+        } else if (currentDir === 'posts') {
+          addOutput('Categories:');
+          categories.forEach(cat => addOutput(`  ${cat}/`));
+        } else if (currentDir === 'category' && currentCategory) {
+          const posts = postsByCategory[currentCategory];
+          if (posts.length === 0) {
+            addOutput('No posts in this category yet.');
+          } else {
+            addOutput('Posts (use "open [slug]" to view):');
+            posts.forEach(post => {
+              addOutput(`  ${post.slug}`);
+            });
+          }
+        }
+        break;
+
+      case 'cd':
+        if (args.length === 0 || args[0] === '/' || args[0] === '~') {
+          currentPath = '~';
+          currentDir = 'root';
+          currentCategory = null;
+          addOutput('Changed to home directory');
+          updatePrompt();
+        } else if (args[0] === '..') {
+          if (currentDir === 'category') {
+            currentPath = '~/posts';
+            currentDir = 'posts';
+            currentCategory = null;
+            addOutput('Changed to posts directory');
+            updatePrompt();
+          } else if (currentDir === 'posts') {
+            currentPath = '~';
+            currentDir = 'root';
+            addOutput('Changed to home directory');
+            updatePrompt();
+          } else {
+            addOutput('Already at home directory');
+          }
+        } else {
+          // Join args back together to handle spaces in directory names
+          const target = args.join(' ').replace(/\/$/, '');
+          
+          if (currentDir === 'root' && target === 'posts') {
+            currentPath = '~/posts';
+            currentDir = 'posts';
+            addOutput('Changed to posts directory');
+            updatePrompt();
+          } else if (currentDir === 'posts' && categories.includes(target)) {
+            currentCategory = target;
+            currentPath = `~/posts/${target}`;
+            currentDir = 'category';
+            addOutput(`Changed to ${target} category`);
+            updatePrompt();
+          } else {
+            addOutput(`cd: ${args.join(' ')}: No such directory`);
+          }
+        }
+        break;
+
+      case 'cat':
+        if (args.length === 0) {
+          addOutput('cat: missing file operand');
+        } else if (currentDir === 'category' && currentCategory) {
+          const posts = postsByCategory[currentCategory];
+          const post = posts.find(p => p.slug === args[0]);
+          if (post) {
+            addOutput('');
+            addOutput(`Title: ${post.data.title}`);
+            addOutput(`Date: ${post.data.pubDate.toDateString()}`);
+            addOutput(`Description: ${post.data.description}`);
+            addOutput('');
+            addOutput(`Use "open ${post.slug}" to view in browser`);
+          } else {
+            addOutput(`cat: ${args[0]}: No such file`);
+          }
+        } else {
+          addOutput('cat: must be in a category directory (cd posts, then cd [category])');
+        }
+        break;
+
+      case 'open':
+        if (args.length === 0) {
+          addOutput('open: missing post slug');
+        } else if (currentDir === 'category' && currentCategory) {
+          const posts = postsByCategory[currentCategory];
+          const post = posts.find(p => p.slug === args[0]);
+          if (post) {
+            window.location.href = `/posts/${post.slug}`;
+          } else {
+            addOutput(`open: ${args[0]}: No such post`);
+          }
+        } else {
+          addOutput('open: must be in a category directory (cd posts, then cd [category])');
+        }
+        break;
+
+      case 'about':
+        window.location.href = '/about';
+        break;
+
+      case 'reading':
+        window.location.href = '/reading';
+        break;
+
+      case 'clear':
+        output.innerHTML = '';
+        break;
+
+      case 'math':
+        mathQuestion = await generateMathQuestion();
+        addOutput(`Quick math: ${mathQuestion.question} = ?`);
+        addOutput('Type your answer:');
+        break;
+
+      case 'trivia':
+        addOutput('Fetching trivia question...');
+        triviaQuestion = await fetchTriviaQuestion();
+        if (triviaQuestion) {
+          addOutput('');
+          addOutput(`Question: ${triviaQuestion.question}`);
+          addOutput('');
+          addOutput('Choices:');
+          triviaQuestion.answers.forEach((ans, idx) => {
+            addOutput(`  ${idx + 1}. ${ans}`);
+          });
+          addOutput('');
+          addOutput('Type your answer:');
+        } else {
+          addOutput('Failed to fetch trivia question. Try again later.');
+        }
+        break;
+
+      case 'echo':
+        addOutput(args.join(' '));
+        break;
+
+      case 'date':
+        addOutput(new Date().toString());
+        break;
+
+      default:
+        addOutput(`${command}: command not found. Type 'help' for available commands.`);
+    }
+  }
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const cmd = input.value;
+      input.value = '';
+      handleCommand(cmd);
+    }
+  });
+
+  // Keep terminal focused
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.terminal')) {
+      input.focus();
+    }
+  });
+</script>
+
