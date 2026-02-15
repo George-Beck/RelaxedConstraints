@@ -7,7 +7,7 @@ const posts = defineCollection({
     description: z.string(),
     pubDate: z.coerce.date(),
     tags: z.array(z.string()).default([]),
-    category: z.enum(['research', 'commentary', 'literature reviews']).default('commentary'),
+    category: z.string().optional(),
   }),
 });
 

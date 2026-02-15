@@ -12,6 +12,7 @@ const { title = "Relaxed Constraints" } = Astro.props;
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{title}</title>
   <link rel="stylesheet" href="/styles/c64.css">
+  <link rel="alternate" type="application/rss+xml" title="Relaxed Constraints" href="/rss.xml" />
 </head>
 <body>
   <div class="crt-frame">
@@ -31,8 +32,28 @@ const { title = "Relaxed Constraints" } = Astro.props;
         <slot />
       </main>
       
-      <footer class="status-bar">
-        <p>George Beck-2026</p>
+      <footer class="site-footer">
+        <form
+          class="subscribe-form"
+          action="https://buttondown.com/api/emails/embed-subscribe/relaxedconstraints"
+          method="post"
+          target="_blank"
+        >
+          <div class="subscribe-row">
+            <input
+              type="email"
+              name="email"
+              placeholder="your@email.com"
+              required
+              class="subscribe-input"
+            />
+            <button type="submit" class="subscribe-btn">Subscribe</button>
+          </div>
+          <p class="subscribe-hint">Get notified when I publish new posts</p>
+        </form>
+        <div class="footer-meta">
+          <span>George Beck &middot; 2026</span>
+        </div>
       </footer>
     </div>
   </div>

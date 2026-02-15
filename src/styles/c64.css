@@ -103,15 +103,94 @@ body {
   min-height: 60vh;
 }
 
-/* Status Bar */
-.status-bar {
+/* Footer */
+.site-footer {
   background-color: var(--bg-secondary);
   border-top: 4px solid var(--border-dark);
-  padding: 1rem 3rem;
-  text-align: center;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+  padding: 1.5rem 3rem;
   box-shadow: 0 -4px 0 var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.subscribe-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.subscribe-row {
+  display: flex;
+  width: 100%;
+  gap: 0;
+}
+
+.subscribe-input {
+  flex: 1;
+  padding: 0.45rem 0.8rem;
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.9rem;
+  background-color: var(--bg-main);
+  border: 2px solid var(--border-dark);
+  border-right: none;
+  color: var(--text-primary);
+}
+
+.subscribe-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.subscribe-btn {
+  padding: 0.45rem 1rem;
+  font-family: 'Inconsolata', monospace;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: var(--accent);
+  color: var(--bg-main);
+  border: 2px solid var(--accent);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.subscribe-btn:hover {
+  background-color: var(--accent-light);
+  border-color: var(--accent-light);
+}
+
+.subscribe-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.footer-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.footer-rss {
+  font-size: 0.75rem;
+  text-decoration: none;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-dark);
+  padding: 0.1rem 0.4rem;
+  transition: all 0.15s;
+}
+
+.footer-rss:hover {
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 /* Typography */
@@ -353,8 +432,8 @@ article strong {
     padding: 2rem 1.5rem 3rem 1.5rem;
   }
 
-  .status-bar {
-    padding: 1rem 1.5rem;
+  .site-footer {
+    padding: 1.5rem;
   }
 
   .post-list li {

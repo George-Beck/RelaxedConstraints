@@ -1,33 +1,893 @@
 ---
 import C64Layout from '../layouts/C64Layout.astro';
+
+const books = [
+  {
+    title: 'Hedge Hogging',
+    author: 'Barton Biggs',
+    coverUrl: 'https://m.media-amazon.com/images/I/81uH3NcAtvL._AC_UF1000,1000_QL80_.jpg',
+    rating: 3,
+    tags: ['Finance'],
+    dateRead: 'January 2026',
+    tagline:
+      'A reflection on what makes hedge funds both extraordinarily lucrative and exceptionally difficult.',
+    review: ``,
+  },
+  {
+    title: 'The Big Short',
+    author: 'Michael Lewis',
+    coverUrl: 'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1446581171i/26889576.jpg',
+    rating: 4,
+    tags: ['Finance'],
+    dateRead: 'March 2026',
+    tagline:
+      'Leaves you in awe of the systemic fraud and corruption that caused the GFC.',
+    review: ``,
+  },
+];
+
+// Currently reading — add/remove books as you start/finish them
+const currentlyReading = [
+  { title: 'The Age of Turbulence', author: 'Alan Greenspan' },
+  { title: 'Ten Birds That Changed the World', author: 'Stephen Moss'},
+];
+
+// Top 99 Novels reading list — set read: true for books you've finished
+const novels = [
+  { rank: 1, title: 'Madame Bovary', author: 'Gustave Flaubert', year: '1857', read: false },
+  { rank: 2, title: 'Anna Karenina', author: 'Leo Tolstoy', year: '1878', read: false },
+  { rank: 3, title: 'War and Peace', author: 'Leo Tolstoy', year: '1865–1869', read: false },
+  { rank: 4, title: 'One Hundred Years of Solitude', author: 'Gabriel García Márquez', year: '1967', read: false },
+  { rank: 5, title: 'Ulysses', author: 'James Joyce', year: '1922', read: false },
+  { rank: 6, title: 'In Search of Lost Time', author: 'Marcel Proust', year: '1913–1927', read: false },
+  { rank: 7, title: 'Lolita', author: 'Vladimir Nabokov', year: '1955', read: false },
+  { rank: 8, title: 'Don Quixote', author: 'Miguel de Cervantes Saavedra', year: '1605–1615', read: false },
+  { rank: 9, title: 'Nineteen Eighty-Four', author: 'George Orwell', year: '1949', read: false },
+  { rank: 10, title: 'Crime and Punishment', author: 'Fyodor Dostoevsky', year: '1866', read: false },
+  { rank: 11, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', year: '1925', read: true },
+  { rank: 12, title: 'The Brothers Karamazov', author: 'Fyodor Dostoevsky', year: '1880', read: false },
+  { rank: 13, title: 'Frankenstein', author: 'Mary Shelley', year: '1818', read: true },
+  { rank: 14, title: 'Pride and Prejudice', author: 'Jane Austen', year: '1813', read: false },
+  { rank: 15, title: 'Moby Dick', author: 'Herman Melville', year: '1851', read: false },
+  { rank: 16, title: "The Handmaid's Tale", author: 'Margaret Atwood', year: '1985', read: false },
+  { rank: 17, title: 'The Adventures of Huckleberry Finn', author: 'Mark Twain', year: '1884', read: true },
+  { rank: 18, title: 'Beloved', author: 'Toni Morrison', year: '1987', read: false },
+  { rank: 19, title: 'Wuthering Heights', author: 'Emily Brontë', year: '1847', read: true },
+  { rank: 20, title: 'The Lord of the Rings', author: 'J.R.R. Tolkien', year: '1954–1955', read: false },
+  { rank: 21, title: 'Things Fall Apart', author: 'Chinua Achebe', year: '1958', read: true },
+  { rank: 22, title: "Midnight's Children", author: 'Salman Rushdie', year: '1981', read: false },
+  { rank: 23, title: 'Jane Eyre', author: 'Charlotte Brontë', year: '1847', read: false },
+  { rank: 24, title: 'Dracula', author: 'Bram Stoker', year: '1897', read: false },
+  { rank: 25, title: 'Middlemarch', author: 'George Eliot', year: '1872', read: false },
+  { rank: 26, title: "Alice's Adventures in Wonderland", author: 'Lewis Carroll', year: '1865', read: false },
+  { rank: 27, title: 'The Grapes of Wrath', author: 'John Steinbeck', year: '1939', read: false },
+  { rank: 28, title: 'To Kill a Mockingbird', author: 'Harper Lee', year: '1960', read: true },
+  { rank: 29, title: 'The Catcher in the Rye', author: 'J.D. Salinger', year: '1951', read: false },
+  { rank: 30, title: 'The Name of the Rose', author: 'Umberto Eco', year: '1980', read: false },
+  { rank: 31, title: 'The Trial', author: 'Franz Kafka', year: '1925', read: false },
+  { rank: 32, title: 'Tristram Shandy', author: 'Laurence Sterne', year: '1759–1767', read: false },
+  { rank: 33, title: 'The Sound and the Fury', author: 'William Faulkner', year: '1929', read: false },
+  { rank: 34, title: 'Heart of Darkness', author: 'Joseph Conrad', year: '1902', read: false },
+  { rank: 35, title: "Gulliver's Travels", author: 'Jonathan Swift', year: '1726', read: false },
+  { rank: 36, title: 'The Count of Monte-Cristo', author: 'Alexandre Dumas', year: '1844–1846', read: false },
+  { rank: 37, title: 'Invisible Man', author: 'Ralph Ellison', year: '1952', read: false },
+  { rank: 38, title: 'The Red and the Black', author: 'Stendhal', year: '1831', read: false },
+  { rank: 39, title: 'The Portrait of a Lady', author: 'Henry James', year: '1881', read: false },
+  { rank: 40, title: 'The Outsider', author: 'Albert Camus', year: '1942', read: false },
+  { rank: 41, title: 'The Magic Mountain', author: 'Thomas Mann', year: '1924', read: false },
+  { rank: 42, title: 'The Metamorphosis', author: 'Franz Kafka', year: '1916', read: false },
+  { rank: 43, title: 'Les Misérables', author: 'Victor-Marie Hugo', year: '1862', read: false },
+  { rank: 44, title: 'The Tale of Genji', author: 'Murasaki Shikibu', year: 'c.1020', read: false },
+  { rank: 45, title: 'Animal Farm', author: 'George Orwell', year: '1945', read: true },
+  { rank: 46, title: 'The Picture of Dorian Gray', author: 'Oscar Wilde', year: '1891', read: false },
+  { rank: 47, title: 'Mrs Dalloway', author: 'Virginia Woolf', year: '1925', read: false },
+  { rank: 48, title: 'The Hound of the Baskervilles', author: 'Arthur Conan Doyle', year: '1902', read: false },
+  { rank: 49, title: 'The War of the Worlds', author: 'H.G. Wells', year: '1898', read: false },
+  { rank: 50, title: 'Brave New World', author: 'Aldous Huxley', year: '1932', read: false },
+  { rank: 51, title: 'Life of Pi', author: 'Yann Martel', year: '2002', read: false },
+  { rank: 52, title: 'Love in the Time of Cholera', author: 'Gabriel García Márquez', year: '1985', read: false },
+  { rank: 53, title: 'Wide Sargasso Sea', author: 'Jean Rhys', year: '1966', read: false },
+  { rank: 54, title: 'A Portrait of the Artist as a Young Man', author: 'James Joyce', year: '1916', read: false },
+  { rank: 55, title: 'The Little Prince', author: 'Antoine de Saint-Exupéry', year: '1943', read: false },
+  { rank: 56, title: 'Great Expectations', author: 'Charles Dickens', year: '1861', read: true },
+  { rank: 57, title: 'A Sentimental Education', author: 'Gustave Flaubert', year: '1869', read: false },
+  { rank: 58, title: 'Gone with the Wind', author: 'Margaret Mitchell', year: '1936', read: false },
+  { rank: 59, title: 'Blindness', author: 'José Saramago', year: '1995', read: false },
+  { rank: 60, title: 'Rebecca', author: 'Daphne du Maurier', year: '1938', read: false },
+  { rank: 61, title: 'The Maltese Falcon', author: 'Dashiell Hammett', year: '1930', read: false },
+  { rank: 62, title: 'The Golden Notebook', author: 'Doris Lessing', year: '1959', read: false },
+  { rank: 63, title: 'Emma', author: 'Jane Austen', year: '1815', read: false },
+  { rank: 64, title: 'The Talented Mr. Ripley', author: 'Patricia Highsmith', year: '1967', read: false },
+  { rank: 65, title: 'The Master and Margarita', author: 'Mikhail Bulgakov', year: '1967', read: false },
+  { rank: 66, title: 'For Whom the Bell Tolls', author: 'Ernest Hemingway', year: '1940', read: false },
+  { rank: 67, title: 'A Clockwork Orange', author: 'Anthony Burgess', year: '1962', read: false },
+  { rank: 68, title: 'Absalom! Absalom!', author: 'William Faulkner', year: '1936', read: false },
+  { rank: 69, title: 'Under the Volcano', author: 'Malcolm Lowry', year: '1947', read: false },
+  { rank: 70, title: 'Perfume', author: 'Patrick Süskind', year: '1985', read: false },
+  { rank: 71, title: 'All Quiet on the Western Front', author: 'Erich Maria Remarque', year: '1929', read: false },
+  { rank: 72, title: 'The Sorrows of Young Werther', author: 'Johann Wolfgang von Goethe', year: '1774', read: false },
+  { rank: 73, title: 'Candide', author: 'Voltaire', year: '1759', read: false },
+  { rank: 74, title: 'The Age of Innocence', author: 'Edith Wharton', year: '1920', read: false },
+  { rank: 75, title: 'On the Road', author: 'Jack Kerouac', year: '1957', read: false },
+  { rank: 76, title: 'To the Lighthouse', author: 'Virginia Woolf', year: '1927', read: false },
+  { rank: 77, title: 'The Leopard', author: 'Giusseppe Tomasi di Lampedusa', year: '1958', read: false },
+  { rank: 78, title: 'Lord of the Flies', author: 'William Golding', year: '1954', read: true },
+  { rank: 79, title: 'And Then There Were None', author: 'Agatha Christie', year: '1927', read: false },
+  { rank: 80, title: 'The Big Sleep', author: 'Raymond Chandler', year: '1939', read: false },
+  { rank: 81, title: 'As I Lay Dying', author: 'William Faulkner', year: '1930', read: false },
+  { rank: 82, title: 'Slaughterhouse-Five', author: 'Kurt Vonnegut', year: '1969', read: false },
+  { rank: 83, title: 'The Wind-Up Bird Chronicle', author: 'Haruki Murakami', year: '1994–1995', read: false },
+  { rank: 84, title: 'Independent People', author: 'Halldór Laxness', year: '1934–1935', read: false },
+  { rank: 85, title: 'Dune', author: 'Frank Herbert', year: '1965', read: false },
+  { rank: 86, title: 'The Man Without Qualities', author: 'Robert Musil', year: '1930–1943', read: false },
+  { rank: 87, title: 'Hunger', author: 'Knut Hamsun', year: '1899', read: false },
+  { rank: 88, title: 'Bleak House', author: 'Charles Dickens', year: '1853', read: false },
+  { rank: 89, title: 'Memoirs of Hadrian', author: 'Marguerite Yourcenar', year: '1951', read: false },
+  { rank: 90, title: 'Disgrace', author: 'J.M. Coetzee', year: '1999', read: false },
+  { rank: 91, title: 'Neuromancer', author: 'William Gibson', year: '1984', read: false },
+  { rank: 92, title: 'The Prime of Miss Jean Brodie', author: 'Muriel Spark', year: '1961', read: false },
+  { rank: 93, title: 'The Spy Who Came in from the Cold', author: 'John Le Carré', year: '1963', read: false },
+  { rank: 94, title: 'Robinson Crusoe', author: 'Daniel Defoe', year: '1719', read: false },
+  { rank: 95, title: 'The Hobbit', author: 'J.R.R. Tolkien', year: '1937', read: false },
+  { rank: 96, title: 'Atonement', author: 'Ian McEwan', year: '2001', read: false },
+  { rank: 97, title: 'Doctor Zhivago', author: 'Boris Pasternak', year: '1957', read: false },
+  { rank: 98, title: 'Never Let Me Go', author: 'Kazuo Ishiguro', year: '2005', read: false },
+  { rank: 99, title: 'The Three Musketeers', author: 'Alexandre Dumas', year: '1844', read: false },
+];
+
+const novelsRead = novels.filter(n => n.read).length;
 ---
 
 <C64Layout title="Reading - Relaxed Constraints">
-  <h1>Reading List</h1>
-  
-  <h2 style="margin-bottom: 0.5em;">Currently Reading</h2>
-  <ul style="list-style: none; padding-left: 0; margin: 0 0 1.5em 0;">
-    <li style="margin: 0.2em 0;">- <em>Grant</em> by Ron Chernow</li>
-    <li style="margin: 0.2em 0;">- <em>Hedge Hogging</em> by Barton Biggs</li>
-  </ul>
-  
-  <h2 style="margin-bottom: 0.5em;">Read This Year</h2>
-  <ul style="list-style: none; padding-left: 0; margin: 0 0 1.5em 0;">
-    <li style="margin: 0.2em 0;">- <em>The Big Short</em> by Michael Lewis</li>
-  </ul>
-  
-  <h2 style="margin-bottom: 0.5em;">On Deck</h2>
-  <ul style="list-style: none; padding-left: 0; margin: 0 0 1.5em 0;">
-    <li style="margin: 0.2em 0;">- <em>Poor Economics</em> by Abhijit Banerjee and Esther Duflo</li>
-    <li style="margin: 0.2em 0;">- <em>Tuesdays with Morrie</em> by Mitch Albom</li>
-    <li style="margin: 0.2em 0;">- <em>Jane Eyre</em> by Charlotte Brontë</li>
-  </ul>
+  <section class="books-page">
+    <header class="books-header">
+      <h1>Book Reviews</h1>
+    </header>
 
-  <h2 style="margin-bottom: 0.5em;">Reading List</h2>
-  <p style="margin-top: 0.2em;">
-    I want to work through the novels on this list:
-    <a href="https://www.editoreric.com/greatlit/top-99-novels.html" target="_blank" rel="noopener noreferrer">
-      Top 99 Novels
-    </a>
-  </p>
+    {currentlyReading.length > 0 && (
+      <section class="currently-reading">
+        <h2>Currently Reading</h2>
+        <ul class="currently-reading-list">
+          {currentlyReading.map((book) => (
+            <li>
+              <span class="cr-title">{book.title}</span>
+              <span class="cr-author">{book.author}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <div class="books-controls">
+      <div class="books-filters">
+        <button class="books-filter active" data-filter="all">All Books</button>
+        <button class="books-filter" data-filter="Fiction">Fiction</button>
+        <button class="books-filter" data-filter="Biography">Biography</button>
+        <button class="books-filter" data-filter="History">History</button>
+        <button class="books-filter" data-filter="Finance">Finance</button>
+        <button class="books-filter" data-filter="Memoir">Memoir</button>
+        <button class="books-filter" data-filter="Economics">Economics</button>
+        <button class="books-filter" data-filter="Philosophy">Philosophy</button>
+        <button class="books-filter" data-filter="Literature">Literature</button>
+      </div>
+      <div class="books-sort">
+        <button class="books-sort-btn" data-sort="shuffle">Shuffle</button>
+        <button class="books-sort-btn active" data-sort="date">Date</button>
+      </div>
+    </div>
+
+    <div class="books-grid">
+      {books.map((book, index) => (
+        <article
+          class="book-card"
+          data-tags={book.tags.join(' ')}
+          data-date={book.dateRead}
+          data-rating={book.rating}
+          data-index={index}
+        >
+          <button class="book-card-btn" type="button">
+            <div class="book-cover">
+              <img src={book.coverUrl} alt={`${book.title} by ${book.author}`} loading="lazy" />
+            </div>
+            <h3 class="book-title">{book.title} <span class="book-author">{book.author}</span></h3>
+          </button>
+          <div class="book-stars" aria-label={`${book.rating} out of 5 stars`}>
+            {'★'.repeat(book.rating)}{'☆'.repeat(5 - book.rating)}
+          </div>
+          <div class="book-tags">
+            {book.tags.map((tag) => (
+              <span class="book-tag">{tag}</span>
+            ))}
+          </div>
+          <p class="book-tagline">{book.tagline}</p>
+        </article>
+      ))}
+    </div>
+
+    <section class="books-footer">
+      <h2>Reading List</h2>
+      <p>
+        I want to work through the literary works on this list:{' '}
+        <a href="https://www.editoreric.com/greatlit/top-99-literature.html" target="_blank" rel="noopener noreferrer">
+          Top 99 Works of Literature
+        </a>
+      </p>
+      <p class="reading-list-progress">{novelsRead} / 99 read</p>
+      <div class="reading-list-table-wrap">
+        <table class="reading-list-table">
+          <thead>
+            <tr>
+              <th class="col-num">#</th>
+              <th class="col-title">Title</th>
+              <th class="col-author">Author</th>
+              <th class="col-year">Year</th>
+              <th class="col-read">Read</th>
+            </tr>
+          </thead>
+          <tbody>
+            {novels.map((n) => (
+              <tr class={n.read ? 'is-read' : ''}>
+                <td class="col-num">{n.rank}</td>
+                <td class="col-title">{n.title}</td>
+                <td class="col-author">{n.author}</td>
+                <td class="col-year">{n.year}</td>
+                <td class="col-read">{n.read ? '✓' : ''}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <!-- Full-screen modal -->
+  <div class="book-modal" id="book-modal" aria-hidden="true">
+    <div class="book-modal-content">
+      <div class="book-modal-left">
+        <div class="book-modal-cover-wrap">
+          <img class="book-modal-cover" id="modal-cover" alt="" />
+        </div>
+        <div class="book-modal-tags" id="modal-tags"></div>
+        <div class="book-modal-stars" id="modal-stars"></div>
+        <p class="book-modal-tagline" id="modal-tagline"></p>
+        <div class="book-modal-dates">
+          <p id="modal-date-read"></p>
+        </div>
+      </div>
+      <div class="book-modal-right">
+        <button class="book-modal-close" id="book-modal-close" aria-label="Close">&times;</button>
+        <div class="book-modal-right-inner">
+          <div class="book-modal-review" id="modal-review"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Book data for client-side access -->
+  <script type="application/json" id="books-data" set:html={JSON.stringify(books)}></script>
+
+  <script>
+    const booksData = JSON.parse(document.getElementById('books-data')!.textContent!);
+    const filters = document.querySelectorAll('.books-filter');
+    const cards = Array.from(document.querySelectorAll('.book-card'));
+    const sortButtons = document.querySelectorAll('.books-sort-btn');
+    const grid = document.querySelector('.books-grid');
+
+    // Modal elements
+    const modal = document.getElementById('book-modal')!;
+    const modalClose = document.getElementById('book-modal-close')!;
+    const modalCover = document.getElementById('modal-cover') as HTMLImageElement;
+    const modalTags = document.getElementById('modal-tags')!;
+    const modalStars = document.getElementById('modal-stars')!;
+    const modalTagline = document.getElementById('modal-tagline')!;
+    const modalDateRead = document.getElementById('modal-date-read')!;
+    const modalReview = document.getElementById('modal-review')!;
+
+    // Filter
+    function applyFilter(filter: string) {
+      cards.forEach((card) => {
+        const tags = card.getAttribute('data-tags') || '';
+        if (filter === 'all' || tags.includes(filter)) {
+          (card as HTMLElement).style.display = '';
+        } else {
+          (card as HTMLElement).style.display = 'none';
+        }
+      });
+    }
+
+    // Sort
+    function applySort(sort: string) {
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      let sorted: Element[];
+
+      if (sort === 'shuffle') {
+        sorted = [...cards];
+        for (let i = sorted.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [sorted[i], sorted[j]] = [sorted[j], sorted[i]];
+        }
+      } else {
+        sorted = [...cards].sort((a, b) => {
+          const dateA = a.getAttribute('data-date') || '';
+          const dateB = b.getAttribute('data-date') || '';
+          const partsA = dateA.split(' ');
+          const partsB = dateB.split(' ');
+          const numA = (parseInt(partsA[1]) || 0) * 12 + months.indexOf(partsA[0]);
+          const numB = (parseInt(partsB[1]) || 0) * 12 + months.indexOf(partsB[0]);
+          return numB - numA;
+        });
+      }
+
+      sorted.forEach((card) => grid?.appendChild(card));
+    }
+
+    filters.forEach((button) => {
+      button.addEventListener('click', () => {
+        filters.forEach((btn) => btn.classList.remove('active'));
+        button.classList.add('active');
+        applyFilter(button.getAttribute('data-filter') || 'all');
+      });
+    });
+
+    sortButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        sortButtons.forEach((btn) => btn.classList.remove('active'));
+        button.classList.add('active');
+        applySort(button.getAttribute('data-sort') || 'date');
+      });
+    });
+
+    // Modal
+    function openModal(card: Element) {
+      const index = parseInt(card.getAttribute('data-index') || '0');
+      const book = booksData[index];
+      if (!book) return;
+
+      modalCover.src = book.coverUrl;
+      modalCover.alt = `${book.title} by ${book.author}`;
+
+      // Stars
+      const rating = book.rating || 0;
+      modalStars.textContent = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+
+      // Tagline
+      modalTagline.textContent = book.tagline;
+
+      // Date
+      modalDateRead.textContent = `Last read: ${book.dateRead}`;
+
+      // Tags
+      modalTags.innerHTML = '';
+      book.tags.forEach((tag: string) => {
+        const span = document.createElement('span');
+        span.className = 'modal-tag';
+        span.textContent = tag;
+        modalTags.appendChild(span);
+      });
+
+      // Review — split on double newlines into paragraphs
+      modalReview.innerHTML = '';
+      const paragraphs = (book.review || '').split('\n\n');
+      paragraphs.forEach((text: string) => {
+        if (!text.trim()) return;
+        const p = document.createElement('p');
+        p.textContent = text.trim();
+        modalReview.appendChild(p);
+      });
+
+      modal.setAttribute('aria-hidden', 'false');
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modal.setAttribute('aria-hidden', 'true');
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    cards.forEach((card) => {
+      card.querySelector('.book-card-btn')?.addEventListener('click', () => openModal(card));
+    });
+
+    modalClose.addEventListener('click', closeModal);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+    });
+
+  </script>
+
+  <style>
+    /* ===== Page ===== */
+    .books-page {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .books-header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 1rem;
+    }
+
+    .books-quote {
+      margin: 0.5rem 0 0;
+      color: var(--text-secondary);
+      font-size: 1rem;
+      font-style: italic;
+    }
+
+    /* ===== Currently Reading ===== */
+    .currently-reading {
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-dark);
+      padding: 1.2rem 1.5rem;
+      box-shadow: 3px 3px 0 var(--border);
+    }
+
+    .currently-reading h2 {
+      margin: 0 0 0.6rem;
+      font-size: 1.3rem;
+      border: none;
+      padding: 0;
+    }
+
+    .currently-reading-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .currently-reading-list li {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+
+    .currently-reading-list li::before {
+      content: '▸';
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .cr-title {
+      font-weight: 700;
+      font-style: italic;
+    }
+
+    .cr-author {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .cr-author::before {
+      content: '— ';
+    }
+
+    /* ===== Controls ===== */
+    .books-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .books-filters {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .books-filter {
+      padding: 0.4rem 0.8rem;
+      border: 2px solid var(--border-dark);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-family: 'Inconsolata', monospace;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .books-filter:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .books-filter.active {
+      background: var(--accent);
+      color: var(--bg-main);
+      border-color: var(--accent);
+    }
+
+    .books-sort {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .books-sort-btn {
+      padding: 0.3rem 0.6rem;
+      border: 2px solid var(--border-dark);
+      background: var(--bg-secondary);
+      font-family: 'Inconsolata', monospace;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      color: var(--text-primary);
+      transition: all 0.15s;
+    }
+
+    .books-sort-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .books-sort-btn.active {
+      background: var(--accent);
+      color: var(--bg-main);
+      border-color: var(--accent);
+    }
+
+    /* ===== Grid & Cards ===== */
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    .book-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .book-card-btn {
+      all: unset;
+      cursor: pointer;
+      display: block;
+      text-align: left;
+    }
+
+    .book-card-btn:hover .book-cover img {
+      transform: scale(1.03);
+    }
+
+    .book-card-btn:hover .book-title {
+      color: var(--accent);
+    }
+
+    .book-cover {
+      width: 100%;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+
+    .book-cover img {
+      width: 100%;
+      display: block;
+      transition: transform 0.2s ease;
+    }
+
+    .book-title {
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      line-height: 1.3;
+      transition: color 0.15s;
+    }
+
+    .book-author {
+      display: block;
+      font-size: 0.85rem;
+      font-family: 'Inconsolata', monospace;
+      text-transform: none;
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
+      font-weight: 400;
+    }
+
+    .book-stars {
+      font-size: 0.9rem;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+
+    .book-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.1rem;
+    }
+
+    .book-tag {
+      display: inline-block;
+      padding: 0.1rem 0.4rem;
+      background: var(--accent);
+      color: var(--bg-main);
+      font-size: 0.7rem;
+      text-transform: capitalize;
+      letter-spacing: 0.03em;
+    }
+
+    .book-tagline {
+      margin: 0.2rem 0 0;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .books-footer h2 {
+      margin-bottom: 0.5rem;
+    }
+
+    /* ===== Full-screen Modal ===== */
+    .book-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+    }
+
+    .book-modal.open {
+      display: block;
+    }
+
+    .book-modal-content {
+      display: grid;
+      grid-template-columns: 38% 62%;
+      width: 100%;
+      height: 100%;
+      background: #111113;
+      color: #e2e0db;
+    }
+
+    /* --- Left panel --- */
+    .book-modal-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 2.5rem;
+      border-right: 1px solid #2a2a2e;
+      overflow-y: auto;
+      gap: 0.8rem;
+    }
+
+    .book-modal-cover-wrap {
+      max-width: 240px;
+      width: 100%;
+      margin-bottom: 0.8rem;
+    }
+
+    .book-modal-cover {
+      width: 100%;
+      display: block;
+      border: 1px solid #333;
+    }
+
+    .book-modal-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .modal-tag {
+      display: inline-block;
+      padding: 0.2rem 0.7rem;
+      background: #222226;
+      color: #c8c6c0;
+      font-size: 0.78rem;
+      font-family: 'Inconsolata', monospace;
+      border-radius: 3px;
+      text-transform: capitalize;
+      letter-spacing: 0.03em;
+    }
+
+    .book-modal-stars {
+      font-size: 1.2rem;
+      color: #d4a017;
+      letter-spacing: 0.1em;
+    }
+
+    .book-modal-tagline {
+      margin: 0;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: #bbb8b0;
+      line-height: 1.6;
+      text-align: center;
+      max-width: 280px;
+    }
+
+    .book-modal-dates {
+      margin-top: 0.5rem;
+    }
+
+    .book-modal-dates p {
+      margin: 0.15rem 0;
+      font-size: 0.8rem;
+      color: #b08c30;
+      font-family: 'Inconsolata', monospace;
+    }
+
+    /* --- Right panel --- */
+    .book-modal-right {
+      position: relative;
+      overflow-y: auto;
+    }
+
+    .book-modal-close {
+      position: sticky;
+      top: 0;
+      float: right;
+      background: none;
+      border: none;
+      font-size: 1.6rem;
+      line-height: 1;
+      cursor: pointer;
+      color: #888;
+      padding: 1.2rem 1.5rem;
+      z-index: 2;
+      transition: color 0.15s;
+    }
+
+    .book-modal-close:hover {
+      color: #fff;
+    }
+
+    .book-modal-right-inner {
+      padding: 3rem 3.5rem 3rem 3rem;
+    }
+
+    .book-modal-review p {
+      margin: 0 0 1.4rem;
+      font-size: 1rem;
+      line-height: 1.85;
+      color: #d5d3cd;
+      font-family: 'Inconsolata', monospace;
+    }
+
+    .book-modal-review p:first-child {
+      font-style: italic;
+      color: #c0b080;
+      border-left: 3px solid #665c3a;
+      padding-left: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    /* ===== Reading List Table ===== */
+    .reading-list-progress {
+      margin: 0.5rem 0 0;
+      font-size: 0.95rem;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .reading-list-table-wrap {
+      margin-top: 1.5rem;
+      overflow-x: auto;
+    }
+
+    .reading-list-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .reading-list-table thead {
+      border-bottom: 3px solid var(--border-dark);
+    }
+
+    .reading-list-table th {
+      text-align: left;
+      padding: 0.6rem 0.8rem;
+      font-family: 'VT323', monospace;
+      font-size: 1.1rem;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+    }
+
+    .reading-list-table td {
+      padding: 0.45rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .reading-list-table tr:hover {
+      background: var(--bg-secondary);
+    }
+
+    .reading-list-table tr.is-read {
+      background: var(--bg-secondary);
+    }
+
+    .reading-list-table tr.is-read .col-title {
+      text-decoration: line-through;
+      color: var(--text-secondary);
+    }
+
+    .col-num {
+      width: 3rem;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
+    .col-title {
+      font-weight: 700;
+    }
+
+    .col-author {
+      color: var(--text-secondary);
+    }
+
+    .col-year {
+      width: 7rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .col-read {
+      width: 3.5rem;
+      text-align: center;
+      font-size: 1.1rem;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .books-controls {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .books-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+      }
+
+      .book-modal-content {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+
+      .book-modal-left {
+        padding: 2rem 1.5rem;
+        border-right: none;
+        border-bottom: 1px solid #2a2a2e;
+      }
+
+      .book-modal-right-inner {
+        padding: 2rem 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .books-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .col-year {
+        display: none;
+      }
+
+      .reading-list-table th,
+      .reading-list-table td {
+        padding: 0.4rem 0.5rem;
+        font-size: 0.82rem;
+      }
+    }
+  </style>
 </C64Layout>

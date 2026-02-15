@@ -7,8 +7,7 @@ const sortedPosts = allPosts.sort((a, b) =>
   b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 
-// Get unique tags
-const allTags = [...new Set(sortedPosts.flatMap(post => post.data.tags))];
+const allTags = [...new Set(sortedPosts.flatMap(post => post.data.tags))].sort();
 ---
 
 <C64Layout title="Posts - Relaxed Constraints">
@@ -23,34 +22,37 @@ const allTags = [...new Set(sortedPosts.flatMap(post => post.data.tags))];
     />
   </div>
 
-  <div style="margin: 2em 0; display: flex; gap: 0.5em; flex-wrap: wrap; align-items: center;">
-    <span style="font-weight: bold; color: var(--text-secondary);">Filter by:</span>
-    <button class="tag-filter active" data-tag="all" style="padding: 0.5em 1em; background-color: var(--accent); color: white; border: none; cursor: pointer; font-family: 'Inconsolata', monospace; font-size: 0.9em; text-transform: uppercase;">
-      All
-    </button>
-    <button class="tag-filter" data-tag="research" style="padding: 0.5em 1em; background-color: var(--bg-secondary); color: var(--text-primary); border: 2px solid var(--border-dark); cursor: pointer; font-family: 'Inconsolata', monospace; font-size: 0.9em; text-transform: uppercase;">
-      Research
-    </button>
-    <button class="tag-filter" data-tag="commentary" style="padding: 0.5em 1em; background-color: var(--bg-secondary); color: var(--text-primary); border: 2px solid var(--border-dark); cursor: pointer; font-family: 'Inconsolata', monospace; font-size: 0.9em; text-transform: uppercase;">
-      Commentary
-    </button>
-    <button class="tag-filter" data-tag="literature reviews" style="padding: 0.5em 1em; background-color: var(--bg-secondary); color: var(--text-primary); border: 2px solid var(--border-dark); cursor: pointer; font-family: 'Inconsolata', monospace; font-size: 0.9em; text-transform: uppercase;">
-      Literature Reviews
-    </button>
-  </div>
+  {allTags.length > 0 && (
+    <div style="margin: 2em 0; display: flex; gap: 0.5em; flex-wrap: wrap; align-items: center;">
+      <span style="font-weight: bold; color: var(--text-secondary);">Filter by:</span>
+      <button class="tag-filter active" data-tag="all" style="padding: 0.5em 1em; background-color: var(--accent); color: white; border: none; cursor: pointer; font-family: 'Inconsolata', monospace; font-size: 0.9em; text-transform: uppercase;">
+        All
+      </button>
+      {allTags.map((tag) => (
+        <button class="tag-filter" data-tag={tag} style="padding: 0.5em 1em; background-color: var(--bg-secondary); color: var(--text-primary); border: 2px solid var(--border-dark); cursor: pointer; font-family: 'Inconsolata', monospace; font-size: 0.9em; text-transform: uppercase;">
+          {tag}
+        </button>
+      ))}
+    </div>
+  )}
 
   <ul class="post-list" id="post-list">
     {sortedPosts.map((post) => (
-      <li class="post-item" data-title={post.data.title.toLowerCase()} data-category={post.data.category}>
+      <li class="post-item" data-title={post.data.title.toLowerCase()} data-tags={post.data.tags.join(' ')}>
         <h2>
           <a href={`/posts/${post.slug}`}>{post.data.title}</a>
         </h2>
         <div class="post-meta">
-          <span>{post.data.pubDate.toDateString()}</span>
-          <span style="margin: 0 0.5em;">•</span>
-          <span style="display: inline-block; padding: 0.2em 0.6em; background-color: var(--accent); color: white; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em;">
-            {post.data.category}
-          </span>
+          <span>{post.data.pubDate.toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</span>
+          {post.data.tags.length > 0 && (
+            <span style="margin-left: 0.5em; display: inline-flex; gap: 0.4em;">
+              {post.data.tags.map((tag) => (
+                <span style="display: inline-block; padding: 0.2em 0.6em; background-color: var(--accent); color: white; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em;">
+                  {tag}
+                </span>
+              ))}
+            </span>
+          )}
         </div>
         <p>{post.data.description}</p>
       </li>
@@ -68,10 +70,10 @@ const allTags = [...new Set(sortedPosts.flatMap(post => post.data.tags))];
     function filterPosts() {
       postItems.forEach((item) => {
         const title = item.getAttribute('data-title') || '';
-        const category = item.getAttribute('data-category') || '';
+        const tags = item.getAttribute('data-tags') || '';
         
         const matchesSearch = title.includes(currentSearch);
-        const matchesTag = currentTag === 'all' || category === currentTag;
+        const matchesTag = currentTag === 'all' || tags.includes(currentTag);
         
         if (matchesSearch && matchesTag) {
           item.style.display = 'block';
@@ -92,11 +94,13 @@ const allTags = [...new Set(sortedPosts.flatMap(post => post.data.tags))];
           btn.classList.remove('active');
           btn.style.backgroundColor = 'var(--bg-secondary)';
           btn.style.color = 'var(--text-primary)';
+          btn.style.border = '2px solid var(--border-dark)';
         });
         
         button.classList.add('active');
         button.style.backgroundColor = 'var(--accent)';
         button.style.color = 'white';
+        button.style.border = 'none';
         
         currentTag = button.getAttribute('data-tag') || 'all';
         filterPosts();
@@ -104,4 +108,3 @@ const allTags = [...new Set(sortedPosts.flatMap(post => post.data.tags))];
     });
   </script>
 </C64Layout>
-
