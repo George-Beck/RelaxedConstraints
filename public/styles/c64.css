@@ -393,6 +393,26 @@ article img {
   box-shadow: 4px 4px 0 var(--border);
 }
 
+article figure {
+  margin: 2em 0;
+  padding: 0;
+}
+
+article figure img {
+  margin: 0;
+  display: block;
+  width: 100%;
+}
+
+article figcaption {
+  margin-top: 0.5em;
+  font-size: 0.85em;
+  color: var(--text-secondary);
+  font-style: italic;
+  text-align: center;
+  line-height: 1.4;
+}
+
 article strong {
   font-weight: 700;
   color: var(--text-primary);
