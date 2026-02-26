@@ -1,6 +1,6 @@
 ---
 title: "Trump's Pivot to Section 122"
-description: "Are we facing a 'serious balance-of-payments problem'"
+description: "Are we facing a 'serious balance-of-payments problem'?"
 pubDate: 2026-02-26
 tags: ["policy"]
 category: "commentary"
@@ -33,14 +33,14 @@ It lays out three reasons for the act to be used:
 
 The administration is going with the deficit defense. In Trump’s proclamation authorizing Section 122, he [writes](https://www.whitehouse.gov/presidential-actions/2026/02/imposing-a-temporary-import-surcharge-to-address-fundamental-international-payments-problems/), “I find that a surcharge in the form of ad valorem duties on certain imports is required to deal with the United States’ large and serious balance-of-payments deficit.”
 
-It is important to understand the structure of the balance of payments. It captures transactions between U.S. residents and the rest of the world. Transactions are divided into two separate accounts:
+It is important to understand the structure of the [balance of payments](https://www.rba.gov.au/education/resources/explainers/the-balance-of-payments.html). It captures transactions between U.S. residents and the rest of the world. Transactions are divided into two separate accounts:
 
-current account — net flow of money due to U.S. involvement in international trade  
-	trade balance — value of goods/services the U.S. exports less those it imports  
-capital & financial account — net change in ownership of assets/liabilities  
-	capital transfers — transfer of assets/forgiveness of debts  
-	direct investment — long-term capital investment (direct influence on operations)  
-	portfolio investment — purchase of debt/equity (no direct influence on operations)
+- **current account** — net flow of money due to U.S. involvement in international trade
+  - trade balance — value of goods/services the U.S. exports less those it imports
+- **capital & financial account** — net change in ownership of assets/liabilities
+  - capital transfers — transfer of assets/forgiveness of debts
+  - direct investment — long-term capital investment (direct influence on operations)
+  - portfolio investment — purchase of debt/equity (no direct influence on operations)
 
 This is a simplified explanation. Both the current and capital/financial accounts have additional components. Each transaction initiates a double-entry system of debits and credits. Every transaction has both a debit and a credit.
 
@@ -54,7 +54,7 @@ Generac imports $50 million of electric motors from a Chinese manufacturer. Gene
 
 In 2024, the trade deficit was $903.5 billion. In 2025, it was $901.5 billion. This implies a financial account surplus of roughly $900 billion over the past two years, or roughly 3% of GDP. Large in absolute terms does not imply distress; as a share of GDP, the deficit remains within historical ranges. A deficit, in and of itself, is not a bad thing.
 
-Nikolai Wenzel, a Senior Fellow at the American Institute for Economic Research, wrote an article for independent.org which I think does a very good job summarizing why a financial account surplus is not a bad thing:
+Nikolai Wenzel, a Senior Fellow at the American Institute for Economic Research, [wrote an article](https://www.independent.org/article/2025/06/03/remembering-capital-account-surplus/) for independent.org which I think does a very good job summarizing why a financial account surplus is not a bad thing:
 
 “Just as the U.S. is the biggest economy in the world, it is also the most attractive for foreign investors, and this is for many reasons. The U.S. has a strong tradition of rule of law and protection of property rights. It has deep and liquid financial markets — so deep, in fact, that the U.S. alone has the largest share of the world’s stocks; it accounts for half the value of the world’s stock capitalization. It’s also easier for Americans to buy stocks directly or through mutual funds. Fully 55% of Americans own stock, as opposed to 33% of Britons, 15% of French and Japanese, 14% of Germans and Dutch, 7% of Italians and Chinese, 6% of Indians, and 5% of Belgians. Add to that the dollar’s role as the international currency, and it’s little wonder that almost a trillion dollars’ worth of foreign investment flowed into the country last year.”
 
