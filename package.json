@@ -15,6 +15,6 @@
     "rehype-external-links": "^3.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0"
+    "@types/node": "^25.3.2"
   }
 }
