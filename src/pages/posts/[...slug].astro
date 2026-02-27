@@ -41,24 +41,151 @@ const { Content } = await post.render();
       <a href="/posts" style="font-size: 0.95em;">← Back to all posts</a>
     </div>
 
-    <div class="giscus-comments" style="margin-top: 3em; padding-top: 2em; border-top: 2px solid var(--border);">
+    <div class="comments-section" style="margin-top: 3em; padding-top: 2em; border-top: 2px solid var(--border);">
       <h2 style="margin-top: 0;">Comments</h2>
-      <script src="https://giscus.app/client.js"
-        data-repo="George-Beck/RelaxedConstraints"
-        data-repo-id="R_kgDOQzzJ7g"
-        data-category="General"
-        data-category-id="DIC_kwDOQzzJ7s4C2uJc"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="light"
-        data-lang="en"
-        crossorigin="anonymous"
-        async>
-      </script>
+      <div id="comments-list"></div>
+      <form id="comment-form" class="comment-form">
+        <input type="text" id="comment-name" placeholder="Your name" required class="comment-input" />
+        <textarea id="comment-text" placeholder="Write a comment..." required rows="4" class="comment-textarea"></textarea>
+        <input type="hidden" id="comment-parent" value="" />
+        <div class="comment-form-actions">
+          <span id="replying-to" style="display:none; font-size:0.85em; color:var(--text-secondary);">
+            Replying to <span id="replying-to-name"></span> · <a href="#" id="cancel-reply" style="font-size:0.85em;">cancel</a>
+          </span>
+          <button type="submit" class="comment-submit">Post Comment</button>
+        </div>
+      </form>
     </div>
   </article>
+
+  <script data-slug={post.slug}>
+    const SUPABASE_URL = 'https://tfjwbwwehaotbuenfpky.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmandid3dlaGFvdGJ1ZW5mcGt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDIxMjcsImV4cCI6MjA4Nzc3ODEyN30.gZAVmmWXuTbvJkpkNnnf0qdnsWwUEuY1-FCB3XxIrCM';
+    const POST_SLUG = document.currentScript.dataset.slug;
+
+    const headers = {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json',
+    };
+
+    async function fetchComments() {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/comments?post_slug=eq.${POST_SLUG}&order=created_at.asc`,
+        { headers }
+      );
+      return res.json();
+    }
+
+    function timeAgo(dateStr) {
+      const diff = Date.now() - new Date(dateStr).getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1) return 'just now';
+      if (mins < 60) return `${mins}m ago`;
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return `${hrs}h ago`;
+      const days = Math.floor(hrs / 24);
+      if (days < 30) return `${days}d ago`;
+      return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function renderComments(comments) {
+      const list = document.getElementById('comments-list');
+      if (!comments.length) {
+        list.innerHTML = '<p style="color:var(--text-secondary); font-style:italic;">No comments yet. Be the first!</p>';
+        return;
+      }
+
+      const topLevel = comments.filter(c => !c.parent_id);
+      const replies = comments.filter(c => c.parent_id);
+
+      let html = '';
+      for (const comment of topLevel) {
+        html += renderComment(comment, replies);
+      }
+      list.innerHTML = html;
+
+      list.querySelectorAll('.reply-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.getElementById('comment-parent').value = btn.dataset.id;
+          document.getElementById('replying-to-name').textContent = btn.dataset.name;
+          document.getElementById('replying-to').style.display = 'inline';
+          document.getElementById('comment-text').focus();
+        });
+      });
+    }
+
+    function renderComment(comment, allReplies) {
+      const childReplies = allReplies.filter(r => r.parent_id === comment.id);
+      let repliesHtml = '';
+      for (const reply of childReplies) {
+        repliesHtml += `
+          <div class="comment-reply">
+            <div class="comment-header">
+              <strong>${escapeHtml(reply.author_name)}</strong>
+              <span class="comment-time">${timeAgo(reply.created_at)}</span>
+            </div>
+            <p class="comment-body">${escapeHtml(reply.content)}</p>
+          </div>`;
+      }
+
+      return `
+        <div class="comment">
+          <div class="comment-header">
+            <strong>${escapeHtml(comment.author_name)}</strong>
+            <span class="comment-time">${timeAgo(comment.created_at)}</span>
+          </div>
+          <p class="comment-body">${escapeHtml(comment.content)}</p>
+          <a href="#" class="reply-btn" data-id="${comment.id}" data-name="${escapeHtml(comment.author_name)}">Reply</a>
+          ${repliesHtml ? `<div class="comment-replies">${repliesHtml}</div>` : ''}
+        </div>`;
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    document.getElementById('comment-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('.comment-submit');
+      btn.disabled = true;
+      btn.textContent = 'Posting...';
+
+      const body = {
+        post_slug: POST_SLUG,
+        author_name: document.getElementById('comment-name').value.trim(),
+        content: document.getElementById('comment-text').value.trim(),
+      };
+
+      const parentId = document.getElementById('comment-parent').value;
+      if (parentId) body.parent_id = parentId;
+
+      await fetch(`${SUPABASE_URL}/rest/v1/comments`, {
+        method: 'POST',
+        headers: { ...headers, 'Prefer': 'return=minimal' },
+        body: JSON.stringify(body),
+      });
+
+      document.getElementById('comment-text').value = '';
+      document.getElementById('comment-parent').value = '';
+      document.getElementById('replying-to').style.display = 'none';
+      btn.disabled = false;
+      btn.textContent = 'Post Comment';
+
+      const comments = await fetchComments();
+      renderComments(comments);
+    });
+
+    document.getElementById('cancel-reply').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('comment-parent').value = '';
+      document.getElementById('replying-to').style.display = 'none';
+    });
+
+    fetchComments().then(renderComments);
+  </script>
 </C64Layout>
 
