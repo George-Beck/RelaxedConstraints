@@ -8,7 +8,7 @@ category: "commentary"
 
 After the Supreme Court’s ruling last week that the “IEEPA does not authorize the president to impose tariffs,” Trump was left with the decision of what to do next. This decision followed a majority consensus — both Kalshi and Polymarket had been trading at a 65–70% probability of a ruling against the tariffs since December. The justices were vague on the timeline for refunding, punting the ball to the International Trade Court to decide the distribution of reimbursements.
 
-Trump [described](https://www.foxnews.com/video/6389846213112) the justices’ decision as “an unfortunate ruling” in his State of the Union address last night. After the decision, the effective tariff rate [fell](https://budgetlab.yale.edu/research/state-tariffs-february-21-2026) to 9.1%. 
+Trump [described](https://www.foxnews.com/video/6389846213112) the justices’ decision as “an unfortunate ruling” in his State of the Union address on Tuesday. After the decision, the effective tariff rate [fell](https://budgetlab.yale.edu/research/state-tariffs-february-21-2026) to 9.1%. 
 
 Trump was left with two decisions post-SCOTUS ruling:  
 (1) He could use this as a retreat, claim effectiveness of tariffs, and use the Supreme Court ruling as justification for any future negative fallout.  
