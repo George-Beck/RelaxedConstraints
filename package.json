@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^4.0.0",
-    "@astrojs/rss": "^4.0.15",
+    "@astrojs/rss": "^4.0.18",
     "astro": "^5.0.0",
     "rehype-external-links": "^3.0.0"
   },
