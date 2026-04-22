@@ -58,10 +58,10 @@ const { Content } = await post.render();
     </div>
   </article>
 
-  <script data-slug={post.slug}>
+  <script is:inline define:vars={{ postSlug: post.slug }}>
     const SUPABASE_URL = 'https://tfjwbwwehaotbuenfpky.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmandid3dlaGFvdGJ1ZW5mcGt5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDIxMjcsImV4cCI6MjA4Nzc3ODEyN30.gZAVmmWXuTbvJkpkNnnf0qdnsWwUEuY1-FCB3XxIrCM';
-    const POST_SLUG = document.currentScript.dataset.slug;
+    const POST_SLUG = postSlug;
 
     const headers = {
       'apikey': SUPABASE_ANON_KEY,

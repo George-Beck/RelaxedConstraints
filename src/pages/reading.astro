@@ -44,7 +44,18 @@ const books = [
     dateRead: 'March 2026',
     tagline:
       '"One eye was gluey-blind, the other sparkled with dark deeds."',
-    review: ``,
+    reviewImage: '/truman-capote.jpg',
+    review: `Truman Capote’s writing is striking for its contrast in style. There is simplicity in his narration and dialogue, yet it is paired with moments of vivid, almost cinematic description. The story centers on Holly Golightly, who is presented as a kind of mythical figure, someone the unnamed narrator seems to quietly worship. The moment where the narrator first catches a glimpse of Miss Golightly is illustrative of Capote's style:
+
+> “I could see her, but she couldn't see me. Her short hair shone in the light, yellow and brown. It was a warm evening, almost summer, and she wore a light black dress and black shoes. She was thin but healthy-looking; her mouth was large, and a pair of dark glasses covered her eyes. She wasn't a child, but she wasn't a woman either. I learned later that it was two months before her 19th birthday.”
+
+There seems to be some universal appeal about Holly. Characters are drawn to her, eager to impress her or simply be noticed by her.
+
+Holly’s appeal does not come from any concrete achievement, but from her aura, self-possession, and indifference. This is evident in the parties she hosts, where people are less interested in the event itself and more in proximity to her. Capote describes Holly as an “American geisha,” a girl who accompanies wealthy men in exchange for gifts and money.
+
+The narrator notes that Holly is constantly wearing dark glasses. They obscure her eyes and, symbolically, her true self, keeping her guarded and unreadable. One night, she climbs through the window into the narrator’s Manhattan apartment. A man had been staying at her apartment and had bitten her, forcing her to flee to the fire escape. Her characteristic glasses were left behind, and the narrator saw her eyes for the first time. The phrase is that the eyes are a window to the soul; it seemed Holly did not want anybody to see what lay within. Not because she was hiding some evil intentions, but because the reason people were obsessed with her was her ability to hide these emotions. People put her on a pedestal; if they were to see these emotions, it would be proof that she is, in fact, ordinary, and the edifice of the image she has built would crumble.
+
+How do you survive when your entire success, your livelihood, is built on a falsity? You continue the performance. I think it is interesting to consider how people portray themselves. Whether it is a celebrity walking down the red carpet or the person you meet at a bar, people are often trying to shape how they are perceived. People hide uncertainty with arrogance, sadness with indifference, and ignorance with pretentiousness. Holly hid her uncertainty, her past, under those dark glasses, but when she let down her guard and took them off, the narrator, and in turn the reader, were finally able to see her more clearly. In the same way, we should pay attention to when people take off their metaphorical glasses, because it is then that we see the heart and soul they try to hide.`,
   },
 ];
 
@@ -387,14 +398,28 @@ const novelsRead = novels.filter(n => n.read).length;
         modalTags.appendChild(span);
       });
 
-      // Review — split on double newlines into paragraphs
+      // Review image + text
       modalReview.innerHTML = '';
+      if (book.reviewImage) {
+        const img = document.createElement('img');
+        img.src = book.reviewImage;
+        img.alt = '';
+        img.style.cssText = 'width:100%; max-height:350px; object-fit:cover; margin-bottom:1.5rem; border-radius:2px;';
+        modalReview.appendChild(img);
+      }
       const paragraphs = (book.review || '').split('\n\n');
       paragraphs.forEach((text: string) => {
         if (!text.trim()) return;
-        const p = document.createElement('p');
-        p.textContent = text.trim();
-        modalReview.appendChild(p);
+        const trimmed = text.trim();
+        if (trimmed.startsWith('> ')) {
+          const bq = document.createElement('blockquote');
+          bq.textContent = trimmed.replace(/^>\s?/gm, '');
+          modalReview.appendChild(bq);
+        } else {
+          const p = document.createElement('p');
+          p.textContent = trimmed;
+          modalReview.appendChild(p);
+        }
       });
 
       modal.setAttribute('aria-hidden', 'false');
@@ -778,12 +803,12 @@ const novelsRead = novels.filter(n => n.read).length;
       font-family: 'Inconsolata', monospace;
     }
 
-    .book-modal-review p:first-child {
+    .book-modal-review blockquote {
       font-style: italic;
       color: #c0b080;
       border-left: 3px solid #665c3a;
       padding-left: 1.2rem;
-      margin-bottom: 2rem;
+      margin: 1.5rem 0;
     }
 
     /* ===== Reading List Table ===== */
