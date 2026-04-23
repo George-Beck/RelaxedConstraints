@@ -192,20 +192,9 @@ const novelsRead = novels.filter(n => n.read).length;
     )}
 
     <div class="books-controls">
-      <div class="books-filters">
-        <button class="books-filter active" data-filter="all">All Books</button>
-        <button class="books-filter" data-filter="Fiction">Fiction</button>
-        <button class="books-filter" data-filter="Biography">Biography</button>
-        <button class="books-filter" data-filter="History">History</button>
-        <button class="books-filter" data-filter="Finance">Finance</button>
-        <button class="books-filter" data-filter="Memoir">Memoir</button>
-        <button class="books-filter" data-filter="Economics">Economics</button>
-        <button class="books-filter" data-filter="Philosophy">Philosophy</button>
-        <button class="books-filter" data-filter="Literature">Literature</button>
-      </div>
       <div class="books-sort">
         <button class="books-sort-btn" data-sort="shuffle">Shuffle</button>
-        <button class="books-sort-btn active" data-sort="date">Date</button>
+        <button class="books-sort-btn active" id="date-sort-btn" data-sort="date-desc">Date ↓</button>
       </div>
     </div>
 
@@ -340,6 +329,7 @@ const novelsRead = novels.filter(n => n.read).length;
           [sorted[i], sorted[j]] = [sorted[j], sorted[i]];
         }
       } else {
+        const asc = sort === 'date-asc';
         sorted = [...cards].sort((a, b) => {
           const dateA = a.getAttribute('data-date') || '';
           const dateB = b.getAttribute('data-date') || '';
@@ -347,7 +337,7 @@ const novelsRead = novels.filter(n => n.read).length;
           const partsB = dateB.split(' ');
           const numA = (parseInt(partsA[1]) || 0) * 12 + months.indexOf(partsA[0]);
           const numB = (parseInt(partsB[1]) || 0) * 12 + months.indexOf(partsB[0]);
-          return numB - numA;
+          return asc ? numA - numB : numB - numA;
         });
       }
 
@@ -362,13 +352,28 @@ const novelsRead = novels.filter(n => n.read).length;
       });
     });
 
+    const dateSortBtn = document.getElementById('date-sort-btn')!;
+
     sortButtons.forEach((button) => {
       button.addEventListener('click', () => {
+        if (button.id === 'date-sort-btn') {
+          const current = button.getAttribute('data-sort');
+          if (current === 'date-desc') {
+            button.setAttribute('data-sort', 'date-asc');
+            button.textContent = 'Date ↑';
+          } else {
+            button.setAttribute('data-sort', 'date-desc');
+            button.textContent = 'Date ↓';
+          }
+        }
         sortButtons.forEach((btn) => btn.classList.remove('active'));
         button.classList.add('active');
-        applySort(button.getAttribute('data-sort') || 'date');
+        applySort(button.getAttribute('data-sort') || 'date-desc');
       });
     });
+
+    // Sort by newest on page load
+    applySort('date-desc');
 
     // Modal
     function openModal(card: Element) {
@@ -387,7 +392,7 @@ const novelsRead = novels.filter(n => n.read).length;
       modalTagline.textContent = book.tagline;
 
       // Date
-      modalDateRead.textContent = `Last read: ${book.dateRead}`;
+      modalDateRead.textContent = `Read: ${book.dateRead}`;
 
       // Tags
       modalTags.innerHTML = '';
