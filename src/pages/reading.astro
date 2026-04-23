@@ -44,7 +44,7 @@ const books = [
     dateRead: 'March 2026',
     tagline:
       '"One eye was gluey-blind, the other sparkled with dark deeds."',
-    reviewImage: '/truman-capote.jpg',
+    reviewImages: ['/holly_golightly.jpg', '/truman-capote.jpg'],
     review: `Truman Capote’s writing is striking for its contrast in style. There is simplicity in his narration and dialogue, yet it is paired with moments of vivid, almost cinematic description. The story centers on Holly Golightly, who is presented as a kind of mythical figure, someone the unnamed narrator seems to quietly worship. The moment where the narrator first catches a glimpse of Miss Golightly is illustrative of Capote's style:
 
 > “I could see her, but she couldn't see me. Her short hair shone in the light, yellow and brown. It was a warm evening, almost summer, and she wore a light black dress and black shoes. She was thin but healthy-looking; her mouth was large, and a pair of dark glasses covered her eyes. She wasn't a child, but she wasn't a woman either. I learned later that it was two months before her 19th birthday.”
@@ -398,14 +398,20 @@ const novelsRead = novels.filter(n => n.read).length;
         modalTags.appendChild(span);
       });
 
-      // Review image + text
+      // Review images + text
       modalReview.innerHTML = '';
-      if (book.reviewImage) {
-        const img = document.createElement('img');
-        img.src = book.reviewImage;
-        img.alt = '';
-        img.style.cssText = 'width:100%; max-height:350px; object-fit:cover; margin-bottom:1.5rem; border-radius:2px;';
-        modalReview.appendChild(img);
+      const images = book.reviewImages || (book.reviewImage ? [book.reviewImage] : []);
+      if (images.length) {
+        const row = document.createElement('div');
+        row.style.cssText = `display:grid; grid-template-columns:repeat(${images.length}, 1fr); gap:0.8rem; margin-bottom:1.5rem;`;
+        images.forEach((src: string) => {
+          const img = document.createElement('img');
+          img.src = src;
+          img.alt = '';
+          img.style.cssText = 'width:100%; height:250px; object-fit:cover; border-radius:2px;';
+          row.appendChild(img);
+        });
+        modalReview.appendChild(row);
       }
       const paragraphs = (book.review || '').split('\n\n');
       paragraphs.forEach((text: string) => {
