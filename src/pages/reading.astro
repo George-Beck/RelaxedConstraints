@@ -171,7 +171,7 @@ const novels = [
 const novelsRead = novels.filter(n => n.read).length;
 ---
 
-<C64Layout title="Reading - Relaxed Constraints">
+<C64Layout title="Reading - Relaxed Constraints" description="Book reviews and reading notes by George Beck" ogImage="/typograph-og.jpg">
   <section class="books-page">
     <header class="books-header">
       <h1>Book Reviews</h1>
@@ -264,22 +264,13 @@ const novelsRead = novels.filter(n => n.read).length;
 
   <!-- Full-screen modal -->
   <div class="book-modal" id="book-modal" aria-hidden="true">
-    <div class="book-modal-content">
-      <div class="book-modal-left">
-        <div class="book-modal-cover-wrap">
-          <img class="book-modal-cover" id="modal-cover" alt="" />
-        </div>
-        <div class="book-modal-tags" id="modal-tags"></div>
-        <div class="book-modal-stars" id="modal-stars"></div>
-        <p class="book-modal-tagline" id="modal-tagline"></p>
-        <div class="book-modal-dates">
-          <p id="modal-date-read"></p>
-        </div>
-      </div>
-      <div class="book-modal-right">
-        <button class="book-modal-close" id="book-modal-close" aria-label="Close">&times;</button>
-        <div class="book-modal-right-inner">
-          <div class="book-modal-review" id="modal-review"></div>
+    <button class="book-modal-close" id="book-modal-close" aria-label="Close">&times;</button>
+    <div class="book-modal-scroll" id="book-modal-scroll">
+      <div class="book-modal-content">
+        <div class="book-modal-right">
+          <div class="book-modal-right-inner">
+            <div class="book-modal-review" id="modal-review"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -297,12 +288,8 @@ const novelsRead = novels.filter(n => n.read).length;
 
     // Modal elements
     const modal = document.getElementById('book-modal')!;
+    const modalScroll = document.getElementById('book-modal-scroll') as HTMLElement;
     const modalClose = document.getElementById('book-modal-close')!;
-    const modalCover = document.getElementById('modal-cover') as HTMLImageElement;
-    const modalTags = document.getElementById('modal-tags')!;
-    const modalStars = document.getElementById('modal-stars')!;
-    const modalTagline = document.getElementById('modal-tagline')!;
-    const modalDateRead = document.getElementById('modal-date-read')!;
     const modalReview = document.getElementById('modal-review')!;
 
     // Filter
@@ -381,30 +368,30 @@ const novelsRead = novels.filter(n => n.read).length;
       const book = booksData[index];
       if (!book) return;
 
-      modalCover.src = book.coverUrl;
-      modalCover.alt = `${book.title} by ${book.author}`;
-
       // Stars
       const rating = book.rating || 0;
-      modalStars.textContent = '★'.repeat(rating) + '☆'.repeat(5 - rating);
-
-      // Tagline
-      modalTagline.textContent = book.tagline;
-
-      // Date
-      modalDateRead.textContent = `Read: ${book.dateRead}`;
-
-      // Tags
-      modalTags.innerHTML = '';
-      book.tags.forEach((tag: string) => {
-        const span = document.createElement('span');
-        span.className = 'modal-tag';
-        span.textContent = tag;
-        modalTags.appendChild(span);
-      });
 
       // Review images + text
       modalReview.innerHTML = '';
+      const header = document.createElement('div');
+      header.className = 'modal-review-header';
+
+      const heading = document.createElement('h3');
+      heading.className = 'modal-review-title';
+      heading.textContent = book.title;
+
+      const author = document.createElement('p');
+      author.className = 'modal-review-author';
+      author.textContent = book.author;
+
+      const meta = document.createElement('p');
+      meta.className = 'modal-review-meta';
+      meta.textContent = `${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}  •  ${book.dateRead}`;
+
+      header.appendChild(heading);
+      header.appendChild(author);
+      header.appendChild(meta);
+      modalReview.appendChild(header);
       const images = book.reviewImages || (book.reviewImage ? [book.reviewImage] : []);
       if (images.length) {
         const row = document.createElement('div');
@@ -435,17 +422,34 @@ const novelsRead = novels.filter(n => n.read).length;
 
       modal.setAttribute('aria-hidden', 'false');
       modal.classList.add('open');
-      document.body.style.overflow = 'hidden';
+      modalScroll.scrollTop = 0;
     }
 
     function closeModal() {
       modal.setAttribute('aria-hidden', 'true');
       modal.classList.remove('open');
-      document.body.style.overflow = '';
+      modalScroll.scrollTop = 0;
     }
 
     cards.forEach((card) => {
-      card.querySelector('.book-card-btn')?.addEventListener('click', () => openModal(card));
+      let touchStartY = 0;
+      let didScroll = false;
+
+      card.addEventListener('touchstart', (e) => {
+        touchStartY = (e as TouchEvent).touches[0].clientY;
+        didScroll = false;
+      }, { passive: true });
+
+      card.addEventListener('touchmove', (e) => {
+        if (Math.abs((e as TouchEvent).touches[0].clientY - touchStartY) > 6) {
+          didScroll = true;
+        }
+      }, { passive: true });
+
+      card.addEventListener('click', () => {
+        if (!didScroll) openModal(card);
+        didScroll = false;
+      });
     });
 
     modalClose.addEventListener('click', closeModal);
@@ -604,11 +608,13 @@ const novelsRead = novels.filter(n => n.read).length;
       display: flex;
       flex-direction: column;
       gap: 0.4rem;
+      cursor: pointer;
+      -webkit-tap-highlight-color: rgba(211, 84, 0, 0.18);
     }
 
     .book-card-btn {
       all: unset;
-      cursor: pointer;
+      cursor: inherit;
       display: block;
       text-align: left;
     }
@@ -693,113 +699,58 @@ const novelsRead = novels.filter(n => n.read).length;
       inset: 0;
       z-index: 100;
       display: none;
+      background: #111113;
     }
 
     .book-modal.open {
       display: block;
     }
 
-    .book-modal-content {
-      display: grid;
-      grid-template-columns: 38% 62%;
-      width: 100%;
-      height: 100%;
-      background: #111113;
-      color: #e2e0db;
-    }
-
-    /* --- Left panel --- */
-    .book-modal-left {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 3rem 2.5rem;
-      border-right: 1px solid #2a2a2e;
+    .book-modal-scroll {
+      position: absolute;
+      inset: 0;
       overflow-y: auto;
-      gap: 0.8rem;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
 
-    .book-modal-cover-wrap {
-      max-width: 240px;
-      width: 100%;
-      margin-bottom: 0.8rem;
-    }
-
-    .book-modal-cover {
-      width: 100%;
+    .book-modal-content {
       display: block;
-      border: 1px solid #333;
-    }
-
-    .book-modal-tags {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .modal-tag {
-      display: inline-block;
-      padding: 0.2rem 0.7rem;
-      background: #222226;
-      color: #c8c6c0;
-      font-size: 0.78rem;
-      font-family: 'Inconsolata', monospace;
-      border-radius: 3px;
-      text-transform: capitalize;
-      letter-spacing: 0.03em;
-    }
-
-    .book-modal-stars {
-      font-size: 1.2rem;
-      color: #d4a017;
-      letter-spacing: 0.1em;
-    }
-
-    .book-modal-tagline {
-      margin: 0;
-      font-style: italic;
-      font-size: 0.95rem;
-      color: #bbb8b0;
-      line-height: 1.6;
-      text-align: center;
-      max-width: 280px;
-    }
-
-    .book-modal-dates {
-      margin-top: 0.5rem;
-    }
-
-    .book-modal-dates p {
-      margin: 0.15rem 0;
-      font-size: 0.8rem;
-      color: #b08c30;
-      font-family: 'Inconsolata', monospace;
+      width: 100%;
+      min-height: 100%;
+      color: #e2e0db;
     }
 
     /* --- Right panel --- */
     .book-modal-right {
-      position: relative;
-      overflow-y: auto;
+      overflow: visible;
     }
 
+    /* Close button sits on the fixed overlay itself — always visible */
     .book-modal-close {
-      position: sticky;
-      top: 0;
-      float: right;
-      background: none;
+      position: absolute;
+      top: 0.8rem;
+      right: 0.8rem;
+      z-index: 10;
+      background: rgba(17, 17, 19, 0.7);
       border: none;
-      font-size: 1.6rem;
+      border-radius: 50%;
+      width: 2.4rem;
+      height: 2.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
       line-height: 1;
       cursor: pointer;
-      color: #888;
-      padding: 1.2rem 1.5rem;
-      z-index: 2;
-      transition: color 0.15s;
+      color: #aaa;
+      padding: 0;
+      transition: color 0.15s, background 0.15s;
     }
 
     .book-modal-close:hover {
       color: #fff;
+      background: rgba(17, 17, 19, 1);
     }
 
     .book-modal-right-inner {
@@ -820,6 +771,34 @@ const novelsRead = novels.filter(n => n.read).length;
       border-left: 3px solid #665c3a;
       padding-left: 1.2rem;
       margin: 1.5rem 0;
+    }
+
+    .modal-review-header {
+      display: block;
+      margin: 0 0 1.4rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #2a2a2e;
+    }
+
+    .modal-review-title {
+      margin: 0;
+      font-size: 1.5rem;
+      text-transform: none;
+      letter-spacing: normal;
+      color: #e2e0db;
+    }
+
+    .modal-review-author {
+      margin: 0.2rem 0 0;
+      color: #bbb8b0;
+      font-size: 0.95rem;
+    }
+
+    .modal-review-meta {
+      margin: 0.35rem 0 0;
+      color: #d4a017;
+      font-size: 0.85rem;
+      font-family: 'Inconsolata', monospace;
     }
 
     /* ===== Reading List Table ===== */
@@ -916,19 +895,17 @@ const novelsRead = novels.filter(n => n.read).length;
       }
 
       .book-modal-content {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
+        display: block;
       }
 
-      .book-modal-left {
-        padding: 2rem 1.5rem;
-        border-right: none;
-        border-bottom: 1px solid #2a2a2e;
+      .book-modal-right {
+        overflow: visible;
       }
 
       .book-modal-right-inner {
-        padding: 2rem 1.5rem;
+        padding: 3.5rem 1.2rem 3rem;
       }
+
     }
 
     @media (max-width: 480px) {
